@@ -1,9 +1,10 @@
 package com.example.movieappdb.movieList.ui
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
+import android.view.MotionEvent
+import android.widget.RatingBar
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,10 +17,13 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.imageResource
@@ -35,9 +39,6 @@ import com.example.movieappdb.R
 import com.example.movieappdb.movieList.model.Movies
 import com.example.movieappdb.movieList.model.Routes
 import com.example.movieappdb.ui.theme.MovieAppDbTheme
-import com.example.ratingbar.model.Shimmer
-import com.example.ratingbar.DefaultColor
-import com.example.ratingbar.RatingBar
 
 @Composable
 fun MyApp1(
@@ -67,6 +68,7 @@ fun MyApp1(
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MyApp(
     onInsertAll: (() -> Unit)? = null,
@@ -148,7 +150,7 @@ fun MyApp(
 
 
                                     Text(movie.original_title)
-                                    //Text(text = "Dixon aca esta bien?")
+                                    RatingBar(rating = 0)
 
 
                             }
@@ -226,35 +228,50 @@ fun LoadingCard() {
     }
 }
 
+@ExperimentalComposeUiApi
 @Composable
-private fun RatingbarDemo() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        var rating by remember { mutableStateOf(3.7f) }
+fun RatingBar(
+    modifier: Modifier = Modifier,
+    rating: Int
+) {
+    var ratingState by remember {
+        mutableStateOf(rating)
+    }
 
+    var selected by remember {
+        mutableStateOf(false)
+    }
+    val size by animateDpAsState(
+        targetValue = if (selected) 32.dp else 24.dp,
+        spring(Spring.DampingRatioMediumBouncy)
+    )
 
-        val imageBackground = ImageBitmap.imageResource(id = R.drawable.star_background)
-        val imageForeground = ImageBitmap.imageResource(id = R.drawable.star_foreground)
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            RatingBar(
-                rating = rating,
-                space = 2.dp,
-                imageEmpty = imageBackground,
-                imageFilled = imageForeground,
-                animationEnabled = false,
-                gestureEnabled = true,
-                itemSize = 60.dp
-            ) {
-                rating = it
-            }
-
-            Text(
-                "Rating: $rating",
-                fontSize = 16.sp,
-                color = MaterialTheme.colors.primary
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        for (i in 1..5) {
+            Icon(
+                painter = painterResource(id = R.drawable.star_foreground),
+                contentDescription = "star",
+                modifier = modifier
+                    .width(size)
+                    .height(size)
+                    .pointerInteropFilter {
+                        when (it.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                selected = true
+                                ratingState = i
+                            }
+                            MotionEvent.ACTION_UP -> {
+                                selected = false
+                            }
+                        }
+                        true
+                    },
+                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
             )
-
-
         }
     }
 }
@@ -267,6 +284,6 @@ fun Spacer(size: Int = 8) = Spacer(modifier = Modifier.size(size.dp))
 @Composable
 fun DefaultPreview() {
     MovieAppDbTheme {
-        RatingbarDemo()
+
     }
 }
