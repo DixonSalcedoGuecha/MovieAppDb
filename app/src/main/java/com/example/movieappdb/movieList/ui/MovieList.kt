@@ -1,5 +1,9 @@
 package com.example.movieappdb.movieList.ui
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,23 +15,29 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.movieappdb.R
-import com.example.movieappdb.movieList.domain.GetMoviesService
 import com.example.movieappdb.movieList.model.Movies
 import com.example.movieappdb.movieList.model.Routes
 import com.example.movieappdb.ui.theme.MovieAppDbTheme
+import com.example.ratingbar.model.Shimmer
+import com.example.ratingbar.DefaultColor
+import com.example.ratingbar.RatingBar
 
 @Composable
 fun MyApp1(
@@ -216,6 +226,39 @@ fun LoadingCard() {
     }
 }
 
+@Composable
+private fun RatingbarDemo() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        var rating by remember { mutableStateOf(3.7f) }
+
+
+        val imageBackground = ImageBitmap.imageResource(id = R.drawable.star_background)
+        val imageForeground = ImageBitmap.imageResource(id = R.drawable.star_foreground)
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            RatingBar(
+                rating = rating,
+                space = 2.dp,
+                imageEmpty = imageBackground,
+                imageFilled = imageForeground,
+                animationEnabled = false,
+                gestureEnabled = true,
+                itemSize = 60.dp
+            ) {
+                rating = it
+            }
+
+            Text(
+                "Rating: $rating",
+                fontSize = 16.sp,
+                color = MaterialTheme.colors.primary
+            )
+
+
+        }
+    }
+}
+
 
 @Composable
 fun Spacer(size: Int = 8) = Spacer(modifier = Modifier.size(size.dp))
@@ -224,6 +267,6 @@ fun Spacer(size: Int = 8) = Spacer(modifier = Modifier.size(size.dp))
 @Composable
 fun DefaultPreview() {
     MovieAppDbTheme {
-
+        RatingbarDemo()
     }
 }
