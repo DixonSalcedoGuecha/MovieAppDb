@@ -55,7 +55,7 @@ fun MyAppSearch(
 
 
     //val onChangeScreen by viewModel.onChangedScreen("").obse
-    val movie = Movies(0, "",  "","",false)
+    val movie = Movies(0, "",  "","",false,0)
     val movieUpdate by remember { mutableStateOf(movie) }
 
     Scaffold(

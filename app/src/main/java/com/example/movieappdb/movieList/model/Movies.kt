@@ -9,7 +9,8 @@ data class Movies(
     @ColumnInfo(name = "original_title") var original_title: String,
     @ColumnInfo(name = "image") var image: String,
     @ColumnInfo(name= "overview") var overview: String,
-    @ColumnInfo(name = "favorite") var favorite: Boolean
+    @ColumnInfo(name = "favorite") var favorite: Boolean,
+    @ColumnInfo(name = "ranking") var ranking: Int
 )
 
 @Dao
@@ -28,6 +29,9 @@ interface MoviesDao {
 
     @Query("SELECT * FROM movies WHERE favorite = :favorite")
     fun getFavorites(favorite: Boolean): LiveData<List<Movies>>
+
+    @Query("SELECT * FROM movies WHERE ranking = :ranking > 0")
+    fun getRanking(ranking: Int): LiveData<List<Movies>>
 
     @Query("SELECT * FROM movies WHERE original_title LIKE '%'||:title||'%'")
     fun getSearch(title: String): LiveData<List<Movies>>

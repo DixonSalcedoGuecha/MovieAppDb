@@ -28,7 +28,7 @@ class MovieRepositoryImp @Inject constructor(
                     original_title = it.title,
                     image = "https://image.tmdb.org/t/p/original${it.image}",
                     overview = it.overview,
-                    favorite = false
+                    favorite = false, ranking = 0
                 )
             )
         }

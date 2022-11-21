@@ -53,7 +53,7 @@ fun MyApp1(
 
 
     //val onChangeScreen by viewModel.onChangedScreen("").obse
-    val movie = Movies(0, "", "", "", false)
+    val movie = Movies(0, "", "", "", false, 0)
     val moviesUpdate by remember { mutableStateOf(movie) }
 
     MyApp(
@@ -61,7 +61,7 @@ fun MyApp1(
             viewModel.addAllMovies()
         }, onUpdate = {
             viewModel.updateFavorites(moviesUpdate)
-        }, moviesUpdate, movies, isLoading, insertMovie, navigationController
+        }, moviesUpdate, movies, isLoading, insertMovie, navigationController,viewModel
     )
 
 
@@ -78,6 +78,7 @@ fun MyApp(
     isLoading: Boolean,
     insertMovie: Boolean,
     navigationController: NavHostController,
+    viewModel: MovieListViewModel = hiltViewModel()
 
     ) {
 
@@ -148,9 +149,70 @@ fun MyApp(
                                 Modifier.weight(0.5f),
                             ) {
 
+                                val rating = movie.ranking
 
-                                    Text(movie.original_title)
-                                    RatingBar(rating = 0)
+
+
+                                Text(movie.original_title)
+
+                                var ratingState by remember {
+                                    mutableStateOf(rating)
+                                }
+                                var movieState by remember {
+                                    mutableStateOf(movie.ranking)
+                                }
+
+                                var selected by remember {
+                                    mutableStateOf(false)
+                                }
+                                val size by animateDpAsState(
+                                    targetValue = if (selected) 32.dp else 24.dp,
+                                    spring(Spring.DampingRatioMediumBouncy)
+                                )
+
+                                Row(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Start
+                                ) {
+                                    for (i in 1..5) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.star_foreground),
+                                            contentDescription = "star",
+                                            modifier = Modifier
+                                                .width(size)
+                                                .height(size)
+                                                .pointerInteropFilter {
+
+                                                    when (it.action) {
+
+                                                        MotionEvent.ACTION_DOWN -> {
+                                                            selected = true
+                                                            ratingState = i
+                                                            movieState = i
+
+                                                        }
+                                                        MotionEvent.ACTION_UP -> {
+                                                            selected = false
+                                                        }
+                                                    }
+
+                                                    movieUpdate.id = movie.id
+                                                    movieUpdate.original_title = movie.original_title
+                                                    movieUpdate.image = movie.image
+                                                    movieUpdate.overview = movie.overview
+                                                    movieUpdate.favorite = movie.favorite
+
+                                                    movieUpdate.ranking = i
+
+                                                    onUpdate.invoke(movieUpdate)
+
+                                                    true
+                                                },
+                                            tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+                                        )
+                                    }
+                                }
 
 
                             }
@@ -164,6 +226,8 @@ fun MyApp(
                                 movieUpdate.image = movie.image
                                 movieUpdate.overview = movie.overview
                                 movieUpdate.favorite = !movie.favorite
+                                movieUpdate.ranking = movie.ranking
+
                                 onUpdate.invoke(movieUpdate)
 
 
@@ -232,7 +296,9 @@ fun LoadingCard() {
 @Composable
 fun RatingBar(
     modifier: Modifier = Modifier,
-    rating: Int
+    rating: Int,
+    movieUpdate: Movies,
+    onUpdate: (Movies) -> Unit? = null!!,
 ) {
     var ratingState by remember {
         mutableStateOf(rating)
@@ -259,15 +325,21 @@ fun RatingBar(
                     .width(size)
                     .height(size)
                     .pointerInteropFilter {
+
                         when (it.action) {
+
                             MotionEvent.ACTION_DOWN -> {
                                 selected = true
                                 ratingState = i
+
                             }
                             MotionEvent.ACTION_UP -> {
                                 selected = false
                             }
                         }
+
+
+
                         true
                     },
                 tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
@@ -275,6 +347,8 @@ fun RatingBar(
         }
     }
 }
+
+
 
 
 @Composable

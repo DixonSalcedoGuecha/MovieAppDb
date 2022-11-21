@@ -1,5 +1,9 @@
 package com.example.movieappdb.movieList.ui
 
+import android.view.MotionEvent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,10 +13,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -21,6 +22,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.movieappdb.R
@@ -38,8 +42,7 @@ fun MyFavorites(
     val isLoading by viewModel.isLoading.observeAsState(false)
 
 
-
-    val movie = Movies(0,"","","",false)
+    val movie = Movies(0, "", "", "", false, 0)
     val recipeUpdate by remember { mutableStateOf(movie) }
 
 
@@ -52,6 +55,7 @@ fun MyFavorites(
 
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MyAppFavorite(
 
@@ -60,11 +64,12 @@ fun MyAppFavorite(
     moviesFavorite: List<Movies>,
     isLoading: Boolean,
     navigationController: NavHostController,
+    viewModel: MovieListViewModel = hiltViewModel()
 
-    ) {
+) {
     Scaffold(
         topBar = {
-            TopAppBar  (
+            TopAppBar(
                 title = {
                     IconButton(onClick = {
                         navigationController.popBackStack()
@@ -90,6 +95,7 @@ fun MyAppFavorite(
                     auxIndex--
                 }
                 val movie = moviesFavorite[auxIndex]
+                println(movie.ranking)
 
 
 
@@ -116,16 +122,86 @@ fun MyAppFavorite(
                             Column(
                                 Modifier.weight(1f),
                             ) {
+                                val rating = movie.ranking
+
+
+
                                 Text(movie.original_title)
+
+                                var ratingState by remember {
+                                    mutableStateOf(rating)
+                                }
+                                var movieState by remember {
+                                    mutableStateOf(movie.ranking)
+                                }
+
+                                var selected by remember {
+                                    mutableStateOf(false)
+                                }
+                                val size by animateDpAsState(
+                                    targetValue = if (selected) 32.dp else 24.dp,
+                                    spring(Spring.DampingRatioMediumBouncy)
+                                )
+
+                                Row(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Start
+                                ) {
+                                    for (i in 1..5) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.star_foreground),
+                                            contentDescription = "star",
+                                            modifier = Modifier
+                                                .width(size)
+                                                .height(size)
+                                                .pointerInteropFilter {
+
+                                                    when (it.action) {
+
+                                                        MotionEvent.ACTION_DOWN -> {
+                                                            selected = true
+                                                            ratingState = i
+                                                            movieState = i
+
+                                                        }
+                                                        MotionEvent.ACTION_UP -> {
+                                                            selected = false
+                                                        }
+                                                    }
+
+                                                    movieUpdate.id = movie.id
+                                                    movieUpdate.original_title =
+                                                        movie.original_title
+                                                    movieUpdate.image = movie.image
+                                                    movieUpdate.overview = movie.overview
+                                                    movieUpdate.favorite = movie.favorite
+
+                                                    movieUpdate.ranking = i
+
+                                                    onUpdate.invoke(movieUpdate)
+
+                                                    true
+                                                },
+                                            tint = if (i <= ratingState) Color(0xFFFFD700) else Color(
+                                                0xFFA2ADB1
+                                            )
+                                        )
+                                    }
+                                }
+
+
                             }
                             Spacer()
                             IconButton(onClick = {
+
 
                                 movieUpdate.id = movie.id
                                 movieUpdate.image = movie.image
                                 movieUpdate.original_title = movie.original_title
                                 movieUpdate.overview = movie.overview
                                 movieUpdate.favorite = !movie.favorite
+                                movieUpdate.ranking = movie.ranking
                                 onUpdate.invoke(movieUpdate)
 
 
