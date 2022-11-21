@@ -6,6 +6,7 @@
 2. Para inyección de dependencias se está usando Hilt
 3. Para manejo de datos se está usando Room
 4. Para consumir el API gratuita se está usando Retrofit
+5. Se implementaron Varias Capas como Presentacion, Data , Dominio para el uso de clean architecture
 
 # Aspectos antes de ejecutar el proyecto
 
