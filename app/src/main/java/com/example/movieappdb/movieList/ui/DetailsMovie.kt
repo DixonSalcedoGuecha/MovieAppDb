@@ -58,7 +58,7 @@ fun DetailView(
         Column {
             Box(
                 modifier = Modifier
-                    .height(200.dp)
+                    .height(300.dp)
                     .fillMaxWidth(),
                 contentAlignment = Alignment.Center
 
