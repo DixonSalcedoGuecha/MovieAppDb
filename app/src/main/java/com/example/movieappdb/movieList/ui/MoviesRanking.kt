@@ -38,7 +38,7 @@ fun MovieRanking(
     viewModel: MoviesRankingViewModel = hiltViewModel(),
 
     ) {
-    val moviesFavorite by viewModel.movieFavorites.observeAsState(arrayListOf())
+    val moviesRanking by viewModel.movieRanking.observeAsState(arrayListOf())
     val isLoading by viewModel.isLoading.observeAsState(false)
 
 
@@ -47,8 +47,8 @@ fun MovieRanking(
 
 
     MyAppRanking(onUpdate = {
-        viewModel.updateFavorites(recipeUpdate)
-    }, recipeUpdate, moviesFavorite, isLoading, navigationController)
+        viewModel.updateRanking(recipeUpdate)
+    }, recipeUpdate, moviesRanking, isLoading, navigationController)
 
 }
 @OptIn(ExperimentalComposeUiApi::class)
@@ -56,7 +56,7 @@ fun MovieRanking(
 fun MyAppRanking(
     onUpdate: (Movies) -> Unit? = null!!,
     movieUpdate: Movies,
-    moviesFavorite: List<Movies>,
+    moviesRanking: List<Movies>,
     isLoading: Boolean,
     navigationController: NavHostController
 
@@ -79,7 +79,7 @@ fun MyAppRanking(
     ) {
         LazyColumn {
 
-            var itemCount = moviesFavorite.size
+            var itemCount = moviesRanking.size
             if (isLoading) itemCount++
 
             items(count = itemCount) { index ->
@@ -89,7 +89,7 @@ fun MyAppRanking(
                         return@items LoadingCardRanking()
                     auxIndex--
                 }
-                val movie = moviesFavorite[auxIndex]
+                val movie = moviesRanking[auxIndex]
                 println(movie.ranking)
 
 

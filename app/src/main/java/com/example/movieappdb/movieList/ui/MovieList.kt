@@ -41,12 +41,10 @@ fun MyApp1(
 
     ) {
     val movies by viewModel.movie.observeAsState(arrayListOf())
-    val moviesFavorites by viewModel.movieFavorites.observeAsState(arrayListOf())
     val isLoading by viewModel.isLoading.observeAsState(false)
     val insertMovie by viewModel.isLoading.observeAsState(false)
 
 
-    //val onChangeScreen by viewModel.onChangedScreen("").obse
     val movie = Movies(0, "", "", "", false, 0)
     val moviesUpdate by remember { mutableStateOf(movie) }
 

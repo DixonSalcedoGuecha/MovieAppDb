@@ -26,28 +26,14 @@ class MoviesFavoritesViewModel@Inject constructor(
 
 
 
-    val movie: LiveData<List<Movies>> by lazy {
-        userRepo.getAllMovies()
-    }
 
     val movieFavorites: LiveData<List<Movies>> by lazy {
         userRepo.getAllFavorites()
     }
 
 
-    private val _recipeUpdate: MutableLiveData<String> by lazy {
-        MutableLiveData<String>("")
-    }
-    val recipeUpdate: LiveData<String> get() = _recipeUpdate
 
-    fun addAllRecipes() {
-        if (_isLoading.value == false)
-            viewModelScope.launch(Dispatchers.IO) {
-                _isLoading.postValue(true)
-                userRepo.getInsertMovies()
-                _isLoading.postValue(false)
-            }
-    }
+
 
 
 
@@ -65,18 +51,7 @@ class MoviesFavoritesViewModel@Inject constructor(
     private val _title = MutableLiveData<String>()
     val title: LiveData<String> = _title
 
-    val listSearch: LiveData<List<Movies>> by lazy {
-        titleSearch(_title.value.toString())
-    }
-    fun titleSearch(title:String): LiveData<List<Movies>> {
-        println(title)
-        _title.value = title
-        if (title.isNotEmpty()){
-            userRepo.getSearch(title)
-        }
-        return userRepo.getSearch(_title.value.toString())
 
-    }
 
 
 }
