@@ -24,6 +24,11 @@
 
 ![Screenshot_20221121_043601](https://user-images.githubusercontent.com/80532552/203017138-a43bd2ba-cb86-47f5-b3e7-334395824248.png)
 
+  # Detalle de una Pelicula seleccionada
+  
+  ![Detalle de la Pelicula](https://user-images.githubusercontent.com/80532552/203019663-ceef309f-6d4b-4157-a4e7-4d9cf670c136.png)
+
+
   # Lista de la pantalla Principal pero seleccionando dos favoritos y poniendo una calificacion para 5
 
 ![Calificando y agregando a Favoritos](https://user-images.githubusercontent.com/80532552/203017426-cb0a7410-dac5-488f-9c68-6bcaf2f06956.png)
