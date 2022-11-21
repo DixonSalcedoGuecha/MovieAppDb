@@ -30,8 +30,8 @@ interface MoviesDao {
     @Query("SELECT * FROM movies WHERE favorite = :favorite")
     fun getFavorites(favorite: Boolean): LiveData<List<Movies>>
 
-    @Query("SELECT * FROM movies WHERE ranking = :ranking > 0")
-    fun getRanking(ranking: Int): LiveData<List<Movies>>
+    @Query("SELECT * FROM movies WHERE ranking > 0 ORDER BY ranking DESC")
+    fun getRanking(): LiveData<List<Movies>>
 
     @Query("SELECT * FROM movies WHERE original_title LIKE '%'||:title||'%'")
     fun getSearch(title: String): LiveData<List<Movies>>

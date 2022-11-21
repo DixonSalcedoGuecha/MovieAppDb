@@ -11,111 +11,86 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import com.example.movieappdb.R
+import coil.compose.AsyncImage
 import com.example.movieappdb.movieList.model.Movies
 import com.example.movieappdb.movieList.model.Routes
-import com.example.movieappdb.ui.theme.MovieAppDbTheme
+
 
 @Composable
-fun MyApp1(
+fun MovieRanking(
     navigationController: NavHostController,
-    viewModel: MovieListViewModel = hiltViewModel(),
+    viewModel: MoviesRankingViewModel = hiltViewModel(),
 
     ) {
-    val movies by viewModel.movie.observeAsState(arrayListOf())
-    val moviesFavorites by viewModel.movieFavorites.observeAsState(arrayListOf())
+    val moviesFavorite by viewModel.movieFavorites.observeAsState(arrayListOf())
     val isLoading by viewModel.isLoading.observeAsState(false)
-    val insertMovie by viewModel.isLoading.observeAsState(false)
 
 
-    //val onChangeScreen by viewModel.onChangedScreen("").obse
     val movie = Movies(0, "", "", "", false, 0)
-    val moviesUpdate by remember { mutableStateOf(movie) }
+    val recipeUpdate by remember { mutableStateOf(movie) }
 
-    MyApp(
-        onInsertAll = {
-            viewModel.addAllMovies()
-        }, onUpdate = {
-            viewModel.updateFavorites(moviesUpdate)
-        }, moviesUpdate, movies, isLoading, insertMovie, navigationController,viewModel
-    )
 
+    MyAppRanking(onUpdate = {
+        viewModel.updateFavorites(recipeUpdate)
+    }, recipeUpdate, moviesFavorite, isLoading, navigationController)
 
 }
-
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MyApp(
-    onInsertAll: (() -> Unit)? = null,
+fun MyAppRanking(
     onUpdate: (Movies) -> Unit? = null!!,
     movieUpdate: Movies,
-    movies: List<Movies>,
+    moviesFavorite: List<Movies>,
     isLoading: Boolean,
-    insertMovie: Boolean,
-    navigationController: NavHostController,
-    viewModel: MovieListViewModel = hiltViewModel()
+    navigationController: NavHostController
 
     ) {
-
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "List of Movies")
+                    IconButton(onClick = {
+                        navigationController.popBackStack()
+                    }) {
+                        Icon(Icons.Filled.ArrowBack, "Search")
+                    }
+                    Text(text = "Ranking")
 
-                },
-                actions = {
-                    IconButton(onClick = {
-                        navigationController.navigate(Routes.Search.rute)
-                    }) {
-                        Icon(Icons.Filled.Star, "Search")
-                    }
-                    IconButton(onClick = {
-                        navigationController.navigate(Routes.Favorites.rute)
-                    }) {
-                        Icon(Icons.Filled.Favorite, "Favorite")
-                    }
                 }
             )
         }
     ) {
         LazyColumn {
 
-            var itemCount = movies.size
-            if (itemCount == 0 && insertMovie == false) {
-                onInsertAll?.invoke()
-
-            }
+            var itemCount = moviesFavorite.size
             if (isLoading) itemCount++
 
             items(count = itemCount) { index ->
                 var auxIndex = index;
                 if (isLoading) {
                     if (auxIndex == 0)
-                        return@items LoadingCard()
+                        return@items LoadingCardRanking()
                     auxIndex--
                 }
-                val movie = movies[auxIndex]
+                val movie = moviesFavorite[auxIndex]
+                println(movie.ranking)
 
 
 
@@ -140,9 +115,8 @@ fun MyApp(
                             )
                             Spacer()
                             Column(
-                                Modifier.weight(0.5f),
+                                Modifier.weight(1f),
                             ) {
-
                                 val rating = movie.ranking
 
 
@@ -192,7 +166,8 @@ fun MyApp(
                                                     }
 
                                                     movieUpdate.id = movie.id
-                                                    movieUpdate.original_title = movie.original_title
+                                                    movieUpdate.original_title =
+                                                        movie.original_title
                                                     movieUpdate.image = movie.image
                                                     movieUpdate.overview = movie.overview
                                                     movieUpdate.favorite = movie.favorite
@@ -203,25 +178,25 @@ fun MyApp(
 
                                                     true
                                                 },
-                                            tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+                                            tint = if (i <= ratingState) Color(0xFFFFD700) else Color(
+                                                0xFFA2ADB1
+                                            )
                                         )
                                     }
                                 }
 
 
                             }
-
-
                             Spacer()
                             IconButton(onClick = {
 
+
                                 movieUpdate.id = movie.id
-                                movieUpdate.original_title = movie.original_title
                                 movieUpdate.image = movie.image
+                                movieUpdate.original_title = movie.original_title
                                 movieUpdate.overview = movie.overview
                                 movieUpdate.favorite = !movie.favorite
                                 movieUpdate.ranking = movie.ranking
-
                                 onUpdate.invoke(movieUpdate)
 
 
@@ -245,9 +220,8 @@ fun MyApp(
     }
 }
 
-
 @Composable
-fun LoadingCard() {
+fun LoadingCardRanking() {
     Card(
 
         shape = RoundedCornerShape(8.dp),
@@ -260,9 +234,9 @@ fun LoadingCard() {
         Row(modifier = Modifier.padding(8.dp)) {
 
 
-            Spacer()
+            SpacerRanking()
             Column {
-                Spacer()
+                SpacerRanking()
                 Box {
                     Column {
                         Box(
@@ -271,7 +245,7 @@ fun LoadingCard() {
                                 .fillMaxWidth()
                                 .background(Color.Gray)
                         )
-                        Spacer()
+                        SpacerRanking()
                         Box(
                             modifier = Modifier
                                 .height(15.dp)
@@ -286,72 +260,6 @@ fun LoadingCard() {
     }
 }
 
-@ExperimentalComposeUiApi
-@Composable
-fun RatingBar(
-    modifier: Modifier = Modifier,
-    rating: Int,
-    movieUpdate: Movies,
-    onUpdate: (Movies) -> Unit? = null!!,
-) {
-    var ratingState by remember {
-        mutableStateOf(rating)
-    }
-
-    var selected by remember {
-        mutableStateOf(false)
-    }
-    val size by animateDpAsState(
-        targetValue = if (selected) 32.dp else 24.dp,
-        spring(Spring.DampingRatioMediumBouncy)
-    )
-
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        for (i in 1..5) {
-            Icon(
-                painter = painterResource(id = R.drawable.star_foreground),
-                contentDescription = "star",
-                modifier = modifier
-                    .width(size)
-                    .height(size)
-                    .pointerInteropFilter {
-
-                        when (it.action) {
-
-                            MotionEvent.ACTION_DOWN -> {
-                                selected = true
-                                ratingState = i
-
-                            }
-                            MotionEvent.ACTION_UP -> {
-                                selected = false
-                            }
-                        }
-
-
-
-                        true
-                    },
-                tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
-            )
-        }
-    }
-}
-
-
-
 
 @Composable
-fun Spacer(size: Int = 8) = Spacer(modifier = Modifier.size(size.dp))
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    MovieAppDbTheme {
-
-    }
-}
+fun SpacerRanking(size: Int = 8) = Spacer(modifier = Modifier.size(size.dp))

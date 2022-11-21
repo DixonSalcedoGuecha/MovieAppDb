@@ -19,7 +19,7 @@ import com.example.movieappdb.movieList.model.Routes
 import com.example.movieappdb.movieList.ui.DetailView
 import com.example.movieappdb.movieList.ui.MyApp1
 import com.example.movieappdb.movieList.ui.MyFavorites
-import com.example.movieappdb.movieList.ui.SearchScreen
+import com.example.movieappdb.movieList.ui.MovieRanking
 import com.example.movieappdb.ui.theme.MovieAppDbTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Routes.Search.rute) {
-                            SearchScreen(navigationController)
+                            MovieRanking(navigationController)
                         }
 
 
